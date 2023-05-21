@@ -1,0 +1,19 @@
+{
+  "imports": {
+    "std/": "https://deno.land/std@0.187.0/",
+    "oak/": "https://deno.land/x/oak@v12.4.0/",
+    "reflect/": "https://deno.land/x/reflect_metadata@v0.1.12/"
+  },
+  "tasks": {
+    "dev": "deno run --watch --allow-net src/main.ts"
+  },
+  "compilerOptions": {
+    "emitDecoratorMetadata": true
+  },
+  "fmt": {
+    "lineWidth": 100,
+    "indentWidth": 4,
+    "semiColons": false,
+    "singleQuote": true
+  }
+}
