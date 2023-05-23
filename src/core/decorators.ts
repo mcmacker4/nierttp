@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any ban-types
 import { defineController, defineEndpoint, defineMarkedParameter } from './metadata.ts'
 import {
+BodyEndpointArgument,
     HttpMethod,
     MarkedEndpointArgumentType,
     ParamEndpointArgument,
@@ -48,6 +49,15 @@ export function Put(path: string) {
 }
 
 /**
+ * Decorator to mark a method as a controller endpoint accepting PUT requests
+ * @param path
+ * @returns
+ */
+export function Patch(path: string) {
+    return Endpoint(path, HttpMethod.PATCH)
+}
+
+/**
  * Decorator to mark a method as a controller endpoint accepting DELETE requests
  * @param path
  * @returns
@@ -63,7 +73,7 @@ function Endpoint(path: string, method: HttpMethod) {
         _descriptor: PropertyDescriptor,
     ) {
         if (typeof target == 'function') {
-            console.log('WARN: Controller endpoint methods cannot be static')
+            console.log(`WARNING: Controller endpoint methods cannot be static: ${target.name}:${propertyKey}`)
             return
         }
         defineEndpoint(target, propertyKey, path, method)
@@ -74,9 +84,10 @@ export function Param(name: string) {
     return function (target: any, propertyKey: string, index: number) {
         const meta: ParamEndpointArgument = {
             type: MarkedEndpointArgumentType.Param,
+            position: index,
             paramName: name,
         }
-        defineMarkedParameter(target, propertyKey, index, meta)
+        defineMarkedParameter(target, propertyKey, meta)
     }
 }
 
@@ -84,8 +95,9 @@ export function Session() {
     return function (target: any, propertyKey: string, index: number) {
         const meta: SessionEndpointArgument = {
             type: MarkedEndpointArgumentType.Session,
+            position: index,
         }
-        defineMarkedParameter(target, propertyKey, index, meta)
+        defineMarkedParameter(target, propertyKey, meta)
     }
 }
 
@@ -93,8 +105,9 @@ export function Request() {
     return function (target: any, propertyKey: string, index: number) {
         const meta: RequestEndpointArgument = {
             type: MarkedEndpointArgumentType.Request,
+            position: index,
         }
-        defineMarkedParameter(target, propertyKey, index, meta)
+        defineMarkedParameter(target, propertyKey, meta)
     }
 }
 
@@ -102,7 +115,18 @@ export function Response() {
     return function (target: any, propertyKey: string, index: number) {
         const meta: ResponseEndpointArgument = {
             type: MarkedEndpointArgumentType.Response,
+            position: index,
         }
-        defineMarkedParameter(target, propertyKey, index, meta)
+        defineMarkedParameter(target, propertyKey, meta)
+    }
+}
+
+export function Body() {
+    return function (target: any, propertyKey: string, index: number) {
+        const meta: BodyEndpointArgument = {
+            type: MarkedEndpointArgumentType.Body,
+            position: index,
+        }
+        defineMarkedParameter(target, propertyKey, meta)
     }
 }

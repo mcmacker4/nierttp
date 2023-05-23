@@ -6,6 +6,7 @@ export interface ControllerDefinition {
 export enum HttpMethod {
     GET = 'GET',
     POST = 'POST',
+    PATCH = 'PATCH',
     PUT = 'PUT',
     DELETE = 'DELETE',
     OPTIONS = 'OPTIONS',
@@ -17,26 +18,20 @@ export interface EndpointDefinition {
     path: string
     method: HttpMethod
     propertyKey: string
-    markedArguments: Record<number, MarkedEndpointArgument>
+    markedArguments: MarkedEndpointArgument[]
 }
 
 export enum MarkedEndpointArgumentType {
-    Param = "Param",
-    Session = "Session",
-    Request = "Request",
-    Response = "Response",
-    Body = "Body",
+    Param = 'Param',
+    Session = 'Session',
+    Request = 'Request',
+    Response = 'Response',
+    Body = 'Body',
 }
-//export enum MarkedEndpointArgumentType {
-//    Param = "Param",
-//    Session = "Session",
-//    Request = "Request",
-//    Response = "Response",
-//    Body = "Body",
-//}
 
 export interface MarkedEndpointArgument {
     type: MarkedEndpointArgumentType
+    position: number
 }
 
 export interface ParamEndpointArgument extends MarkedEndpointArgument {

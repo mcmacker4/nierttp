@@ -1,20 +1,38 @@
-import { Controller, Get, Param, Post } from './core/decorators.ts'
-import { getControllerDefinition } from './core/metadata.ts'
+import { Controller, Get, Post, Patch, Param, Body } from './core/decorators.ts'
+import { createOakApplication } from './rest/mod.ts'
 
 @Controller('/api/')
 class MyController {
     @Get('/users')
     getUsers() {
+        return [
+            "All Users!"
+        ]
     }
 
     @Get('/users/:id')
-    getUser(@Param('id') _id: string) {
+    getUser(@Param('id') userId: string) {
+        return {
+            userId,
+            name: "Hans"
+        }
     }
 
     @Post('/users')
-    createUser(_body: Record<string, string>) {
+    // deno-lint-ignore no-explicit-any
+    createUser(@Body() _body: any) {
+        console.log("Creating user!")
+        console.log(_body)
+    }
+
+    @Patch('/users/:id')
+    // deno-lint-ignore no-explicit-any
+    updateUser(@Param('id') id: string, @Body() body: any) {
+        console.log(`Patching user ${id}`)
+        console.log(body)
     }
 }
 
-const definition = getControllerDefinition(MyController)
-console.log(definition)
+const app = createOakApplication(MyController)
+
+await app.listen({ port: 8080 })

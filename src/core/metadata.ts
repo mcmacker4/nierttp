@@ -12,9 +12,9 @@ const endpointsMetaKey = Symbol('endpoints meta')
 const parametersMetaKey = Symbol('parametersMetaKey')
 
 type EndpointsMetadata = EndpointDefinition[]
-type ParametersMetadata = Record<string, Record<number, MarkedEndpointArgument>>
+type ParametersMetadata = Record<string, MarkedEndpointArgument[]>
 
-export function getControllerDefinition(controller: Function): ControllerDefinition {
+export function getControllerDefinition(controller: Function): ControllerDefinition | undefined {
     return Reflect.getMetadata(controllerMetaKey, controller.prototype)
 }
 
@@ -47,29 +47,22 @@ export function defineEndpoint(
     Reflect.defineMetadata(endpointsMetaKey, endpoints, target)
 }
 
-function getEndpointMarkedArguments(
-    target: any,
-    propertyKey: string,
-): Record<number, MarkedEndpointArgument> {
-    const metadata: ParametersMetadata | undefined = Reflect.getMetadata(
-        parametersMetaKey,
-        target,
-    )
-    if (metadata == undefined) {
+function getEndpointMarkedArguments(target: any, propertyKey: string): MarkedEndpointArgument[] {
+    const metadata: ParametersMetadata | undefined = Reflect.getMetadata(parametersMetaKey, target)
+    if (metadata == undefined)
         return []
-    }
-    return metadata[propertyKey] || {}
+    return metadata[propertyKey] || []
 }
 
 export function defineMarkedParameter(
     target: any,
     propertyKey: string,
-    index: number,
     meta: MarkedEndpointArgument,
 ) {
     const parameters: ParametersMetadata = Reflect.getMetadata(parametersMetaKey, target) || {}
-    const methodParameters = parameters[propertyKey] || {}
-    methodParameters[index] = meta
+    const methodParameters = parameters[propertyKey] || []
+    methodParameters.push(meta)
+    methodParameters.sort((a, b) => a.position - b.position)
     parameters[propertyKey] = methodParameters
     Reflect.defineMetadata(parametersMetaKey, parameters, target)
 }
